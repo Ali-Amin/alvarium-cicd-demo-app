@@ -5,7 +5,7 @@
       "username": "dbAdmin",
       "password": "password",
       "collection": "sampleData",
-      "dbName": "dcf-mongodb"
+      "dbName": "AlvariumDB"
     },
     "nextHop": {
       "host": "0.0.0.0",
