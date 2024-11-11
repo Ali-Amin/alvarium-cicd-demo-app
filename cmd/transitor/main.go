@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"flag"
+	"log/slog"
+	"os"
+
 	"github.com/gorilla/mux"
 	"github.com/project-alvarium/alvarium-sdk-go/pkg"
 	SdkConfig "github.com/project-alvarium/alvarium-sdk-go/pkg/config"
@@ -11,8 +14,6 @@ import (
 	"github.com/project-alvarium/ones-demo-2024/internal/bootstrap"
 	"github.com/project-alvarium/ones-demo-2024/internal/config"
 	"github.com/project-alvarium/ones-demo-2024/internal/transitor"
-	"log/slog"
-	"os"
 )
 
 func main() {
@@ -20,7 +21,7 @@ func main() {
 	var configPath string
 	flag.StringVar(&configPath,
 		"cfg",
-		"./res/config.json",
+		"./res/config-mqtt.json",
 		"Path to JSON configuration file.")
 	flag.Parse()
 

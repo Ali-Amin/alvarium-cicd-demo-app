@@ -19,15 +19,16 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"log/slog"
+	"net/http"
+	"sync"
+	"time"
+
 	SdkConfig "github.com/project-alvarium/alvarium-sdk-go/pkg/config"
 	"github.com/project-alvarium/alvarium-sdk-go/pkg/interfaces"
 	"github.com/project-alvarium/ones-demo-2024/internal/config"
 	"github.com/project-alvarium/ones-demo-2024/internal/db"
 	"github.com/project-alvarium/ones-demo-2024/internal/models"
-	"log/slog"
-	"net/http"
-	"sync"
-	"time"
 )
 
 type CreateWorker struct {
@@ -38,7 +39,13 @@ type CreateWorker struct {
 	svc    config.ServiceInfo
 }
 
-func NewCreateWorker(sdk interfaces.Sdk, cfg SdkConfig.SdkInfo, mutate config.ServiceInfo, db *db.MongoProvider, logger interfaces.Logger) CreateWorker {
+func NewCreateWorker(
+	sdk interfaces.Sdk,
+	cfg SdkConfig.SdkInfo,
+	mutate config.ServiceInfo,
+	db *db.MongoProvider,
+	logger interfaces.Logger,
+) CreateWorker {
 	return CreateWorker{
 		cfg:    cfg,
 		db:     db,
@@ -60,7 +67,7 @@ func (c *CreateWorker) BootstrapHandler(ctx context.Context, wg *sync.WaitGroup)
 				c.logger.Error(err.Error())
 				continue
 			}
-			//Save the data
+			// Save the data
 			err = c.db.Save(ctx, data)
 			if err != nil {
 				c.logger.Error(err.Error())
@@ -68,24 +75,28 @@ func (c *CreateWorker) BootstrapHandler(ctx context.Context, wg *sync.WaitGroup)
 			}
 
 			b, _ := json.Marshal(data)
-			//Annotate the data
+			// Annotate the data
 			c.sdk.Create(ctx, b)
 
-			//Send data to the next service
+			// Send data to the next service
 			tr := &http.Transport{
 				DisableKeepAlives: true,
 				TLSClientConfig:   &tls.Config{InsecureSkipVerify: true},
 			}
 			client := &http.Client{Transport: tr}
-			resp, err := client.Post(c.svc.Uri()+"/data", config.HeaderValueJson, bytes.NewBuffer(b))
+			resp, err := client.Post(
+				c.svc.Uri()+"/data",
+				config.HeaderValueJson,
+				bytes.NewBuffer(b),
+			)
 			if err != nil {
 				c.logger.Error(err.Error())
 			} else {
-				//c.logger.Write(logging.DebugLevel,fmt.Sprintf("posted to mutator (%s/data): %s", c.svc.Uri(), string(b)))
+				// c.logger.Write(logging.DebugLevel,fmt.Sprintf("posted to mutator (%s/data): %s", c.svc.Uri(), string(b)))
 				resp.Body.Close()
 			}
 			time.Sleep(1 * time.Second)
-			//cancelled = true /* Uncomment if you just want to run through a single pass */
+			// cancelled = true /* Uncomment if you just want to run through a single pass */
 		}
 		c.logger.Write(slog.LevelDebug, "cancel received")
 	}()

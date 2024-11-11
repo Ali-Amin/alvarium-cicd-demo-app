@@ -18,11 +18,12 @@ import (
 	"crypto/ed25519"
 	"encoding/hex"
 	"fmt"
-	"github.com/oklog/ulid/v2"
-	"github.com/project-alvarium/alvarium-sdk-go/pkg/config"
 	"io/ioutil"
 	"math/rand"
 	"time"
+
+	"github.com/oklog/ulid/v2"
+	"github.com/project-alvarium/alvarium-sdk-go/pkg/config"
 )
 
 const alphanumericCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -43,11 +44,19 @@ func NewSampleData(cfg config.KeyInfo) (SampleData, error) {
 		return SampleData{}, err
 	}
 
+	id, err := ulid.Parse("01JBXS673JT8G24Y8Y4CYH9B0Y")
+	if err != nil {
+		return SampleData{}, err
+	}
+
+	t := time.Now()
 	x := SampleData{
-		Description: factoryRandomFixedLengthString(128, alphanumericCharset),
-		Id:          newULID(),
-		Seed:        factoryRandomFixedLengthString(64, alphanumericCharset),
-		Timestamp:   time.Now().UTC().Format(time.RFC3339Nano),
+		Description: "Creation data",
+		Id:          id,
+		Seed:        "example",
+		Timestamp: t.
+			UTC().
+			Format(time.RFC3339Nano),
 	}
 
 	keyDecoded := make([]byte, hex.DecodedLen(len(key)))

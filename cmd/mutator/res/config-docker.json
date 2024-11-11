@@ -40,7 +40,7 @@
           "user": "mosquitto",
           "password": "",
           "provider": {
-            "host": "dcf-mqtt-broker",
+            "host": "0.0.0.0",
             "protocol": "tcp",
             "port": 1883
           },
