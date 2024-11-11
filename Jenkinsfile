@@ -8,6 +8,7 @@ pipeline {
     environment {
         GO121MODULE = 'on'
         TAG = "${GIT_COMMIT}"
+	DOCKERHUB_CREDENTIALS = credentials("dockerhub_id")
     }
     stages {
         stage('prep - generate source code checksum') {
@@ -39,9 +40,11 @@ pipeline {
         stage('Dockerize') {
             steps {
                 script {
-                    // Define the docker image names
-		    sh "docker build --build-arg TAG=${TAG} -t creator-demo -f Dockerfile.creator ."
-                }
+		    sh 'docker build -t alimamin/creator-demo --build-arg TAG=${TAG} -f Dockerfile.creator .'
+		    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+
+		    sh 'docker push alimamin/creator-demo:latest'
+		}
             }
         }
     }
