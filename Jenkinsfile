@@ -32,7 +32,7 @@ pipeline {
             steps {
                 script {
                     def optionalParams = ['sourceCodeChecksumPath':"${JENKINS_HOME}/jobs/${JOB_NAME}/${BUILD_NUMBER}/sc_checksum"]
-                    alvariumCreate(['source-code', 'vulnerability'], optionalParams)
+                    alvariumCreate(['source-code', 'vulnerability'], 'alimamin/creator-demo:latest', optionalParams)
                 }
             }
         }
