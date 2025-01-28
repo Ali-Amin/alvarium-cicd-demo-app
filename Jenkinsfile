@@ -40,10 +40,10 @@ pipeline {
         stage('Dockerize') {
             steps {
                 script {
-		    sh 'docker build -t alimamin/creator-demo --build-arg TAG=${TAG} -f Dockerfile.creator .'
+		    sh 'docker build -t alimamin/creator-demo:${BUILD_NUMBER} --build-arg TAG=${TAG} -f Dockerfile.creator .'
 		    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
 
-		    sh 'docker push alimamin/creator-demo:latest'
+		    sh 'docker push alimamin/creator-demo:${BUILD_NUMBER}'
 		}
             }
         }

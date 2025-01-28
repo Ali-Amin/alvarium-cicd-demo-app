@@ -43,12 +43,10 @@ func NewCreateWorker(
 	sdk interfaces.Sdk,
 	cfg SdkConfig.SdkInfo,
 	mutate config.ServiceInfo,
-	db *db.MongoProvider,
 	logger interfaces.Logger,
 ) CreateWorker {
 	return CreateWorker{
 		cfg:    cfg,
-		db:     db,
 		logger: logger,
 		sdk:    sdk,
 		svc:    mutate,
@@ -66,11 +64,11 @@ func (c *CreateWorker) BootstrapHandler(ctx context.Context, wg *sync.WaitGroup)
 			return
 		}
 		// Save the data
-		err = c.db.Save(ctx, data)
-		if err != nil {
-			c.logger.Error(err.Error())
-			return
-		}
+		//		err = c.db.Save(ctx, data)
+		//		if err != nil {
+		//			c.logger.Error(err.Error())
+		//			return
+		//		}
 
 		b, _ := json.Marshal(data)
 		// Annotate the data

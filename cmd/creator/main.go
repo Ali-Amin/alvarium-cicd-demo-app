@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"flag"
+	"log/slog"
+	"os"
+
 	"github.com/project-alvarium/alvarium-sdk-go/pkg"
 	SdkConfig "github.com/project-alvarium/alvarium-sdk-go/pkg/config"
 	"github.com/project-alvarium/alvarium-sdk-go/pkg/factories"
@@ -10,9 +13,6 @@ import (
 	"github.com/project-alvarium/ones-demo-2024/internal/bootstrap"
 	"github.com/project-alvarium/ones-demo-2024/internal/config"
 	"github.com/project-alvarium/ones-demo-2024/internal/creator"
-	"github.com/project-alvarium/ones-demo-2024/internal/db"
-	"log/slog"
-	"os"
 )
 
 func main() {
@@ -56,14 +56,7 @@ func main() {
 	}
 	sdk := pkg.NewSdk(annotators, cfg.Sdk, logger)
 
-	// Connect to database
-	database, err := db.NewMongoProvider(cfg.Mongo, logger)
-	if err != nil {
-		logger.Error(err.Error())
-		os.Exit(1)
-	}
-
-	create := creator.NewCreateWorker(sdk, cfg.Sdk, cfg.NextHop, database, logger)
+	create := creator.NewCreateWorker(sdk, cfg.Sdk, cfg.NextHop, logger)
 	ctx, cancel := context.WithCancel(context.Background())
 	bootstrap.Run(
 		ctx,
@@ -71,7 +64,6 @@ func main() {
 		cfg,
 		[]bootstrap.BootstrapHandler{
 			sdk.BootstrapHandler,
-			database.BootstrapHandler,
 			create.BootstrapHandler,
 		})
 }
